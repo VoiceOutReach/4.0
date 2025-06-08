@@ -112,4 +112,8 @@ if st.button("🚀 Generate Messages + Voices"):
     st.download_button("📥 Download All Voice Notes", zip_buffer, "voice_notes.zip")
 
     st.markdown("### ✅ Preview Messages")
-    st.dataframe(df[["first_name", "company_name", "final_message"]])
+    # ✅ Show only columns that exist in the uploaded CSV
+cols_to_show = [col for col in ["first_name", "company_name", "final_message"] if col in df.columns]
+st.markdown("### ✅ Preview Messages")
+st.dataframe(df[cols_to_show])
+
