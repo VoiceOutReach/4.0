@@ -1,3 +1,4 @@
+client = openai.OpenAI()
 
 import streamlit as st
 import pandas as pd
@@ -53,18 +54,19 @@ if st.button("🚀 Generate Messages + Voices"):
         vars = {col.lower().replace(" ", "_"): str(row[col]) for col in df.columns}
         vars["first_name"] = vars.get("first_name") or vars.get("name", "").split(" ")[0]
 
-        if use_gpt:
-            prompt = gpt_prompt.format(**vars)
-            try:
-                response = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=0.6,
-                    max_tokens=100
-                )
-                message = response.choices[0].message["content"].strip()
-            except Exception as e:
-                message = f"[GPT Error] {e}"
+            if use_gpt:
+    prompt = gpt_prompt.format(**vars)
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.6,
+            max_tokens=100
+        )
+        message = response.choices[0].message.content.strip()
+    except Exception as e:
+        message = f"[GPT Error] {e}"
+
         else:
             vars["quick_jd"] = "You're looking for someone with relevant skills."
             try:
