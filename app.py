@@ -25,14 +25,18 @@ st.write("📊 Sample Data", df.head())
 
 # Flexible alias mapping
 alias_map = {
-    "first_name": ["first_name", "stakeholder_first_name", "name"],
+    "first_name": ["first_name", "First Name"],
     "last_name": ["last_name"],
     "full_name": ["full_name"],
-    "company_name": ["company_name", "employer"],
-    "position": ["position", "job_title"],
-    "hiring_for_job_title": ["hiring_for_job_title", "open_role", "job_opening"],
-    "job_description": ["job_description", "jd", "description"]
+    "company_name": ["company_name"],
+    "position": ["position"],
+    "hiring_for_job_title": ["hiring_for_job_title"],
+    "job_description": ["job_description"],
+    "location": ["location"],
+    "industry": ["industry"],
+    "job_location_city": ["job_location_city", "job_location", "location_city"]  # to support the slash
 }
+
 
 def resolve_var(row, key):
     for alias in alias_map.get(key, [key]):
