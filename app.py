@@ -72,9 +72,11 @@ if st.button("🚀 Generate Messages + Voices"):
         row = {k.lower().replace(" ", "_"): v for k, v in row.items()}
         vars = {key: resolve_var(row, key) for key in alias_map}
         if vars.get("first_name"):
-    vars["first_name"] = str(vars["first_name"]).split()[0]
-else:
-    vars["first_name"] = "there"
+            if vars.get("first_name"):
+            vars["first_name"] = str(vars["first_name"]).split()[0]
+        else:
+            vars["first_name"] = "there"
+
 
 
 
