@@ -76,6 +76,8 @@ Hi {first_name}, I saw you're hiring for {hiring_for_job_title} at {company_name
 {job_description} Let's connect!
 """, height=150)
 
+""", height=150)
+
 if st.button("🚀 Generate Messages + Voices"):
     os.makedirs("voice_notes", exist_ok=True)
     mp3_files = []
