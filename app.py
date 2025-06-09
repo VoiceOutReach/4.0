@@ -71,12 +71,11 @@ I have a candidate for the {hiring_for_job_title} role. Keep it under 60 words.
         st.experimental_rerun()
 """, height=160)
 else:
-    template = st.text_area("Template Message", value="""
+ template = st.text_area("Template Message", value="""
 Hi {first_name}, I saw you're hiring for {hiring_for_job_title} at {company_name}.
 {job_description} Let's connect!
 """, height=150)
 
-""", height=150)
 
 if st.button("🚀 Generate Messages + Voices"):
     os.makedirs("voice_notes", exist_ok=True)
