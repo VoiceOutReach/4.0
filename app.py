@@ -22,7 +22,7 @@ df.columns = df.columns.str.lower().str.replace(" ", "_").str.replace("/", "_")
 st.write("📊 Sample Data", df.head())
 
 alias_map = {
-    "first_name": ["first_name"],
+    "first_name": ["first_name", "First_Name"],
     "last_name": ["last_name"],
     "full_name": ["full_name"],
     "company_name": ["company_name"],
