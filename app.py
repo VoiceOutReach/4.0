@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import openai
@@ -63,7 +62,7 @@ if st.button("🚀 Generate Messages + Voices"):
     os.makedirs("voice_notes", exist_ok=True)
     mp3_files = []
     messages = []
-    style_degrees = [1.0, 0.6]
+    style_degrees = [1.0, 0.6]  # rotate voice styles
 
     for idx, row in df.iterrows():
         row = {k.lower().replace(" ", "_").replace("/", "_"): v for k, v in row.items()}
@@ -80,15 +79,15 @@ if st.button("🚀 Generate Messages + Voices"):
                 response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[{"role": "user", "content": prompt}],
-                    temperature=0,
+                    temperature=0.7,
                     max_tokens=100
                 )
-                message = response.choices[0].message.content.strip()
+                message = f"Hi {vars['first_name']}, " + response.choices[0].message.content.strip()
             except Exception as e:
                 message = f"[GPT Error] {e}"
         else:
             try:
-                message = template.format(**vars)
+                message = f"Hi {vars['first_name']}, " + template.format(**vars)
             except:
                 message = "[Formatting Error]"
 
