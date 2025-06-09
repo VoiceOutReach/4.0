@@ -45,12 +45,30 @@ st.markdown("### 🧩 Available Variables for GPT Prompt")
 st.code(", ".join([f"{{{v}}}" for v in available_vars]), language="python")
 
 use_gpt = st.checkbox("Use GPT to generate full message", value=True)
+# 🔍 Variable Suggestions (above GPT prompt)
+st.markdown("### 🧩 Insert Variables into Your Prompt")
+
+for var in available_vars:
+    if st.button(f"Insert {{{var}}}", key=f"btn_{var}"):
+        st.session_state["insert_var"] = f"{{{var}}}"
+
+if "insert_var" not in st.session_state:
+    st.session_state["insert_var"] = ""
 
 if use_gpt:
-    gpt_prompt = st.text_area("Custom GPT Prompt", value="""
-Hi {first_name}, I came across your profile and noticed your work in {position} at {company_name}.
-We're hiring for a {hiring_for_job_title}. The job description mentions: "{job_description}".
-You may be a great fit! Let me know if you'd be open to a quick chat.
+    # Load previously typed prompt or default
+    default_prompt = st.session_state.get("gpt_prompt", """
+Write a LinkedIn message to {first_name}, who is a {position} at {company_name}.
+I have a candidate for the {hiring_for_job_title} role. Keep it under 60 words.
+""")
+
+    gpt_prompt = st.text_area("Custom GPT Prompt", value=default_prompt, key="gpt_prompt", height=150)
+
+    # Append inserted variable to text area
+    if st.session_state["insert_var"]:
+        gpt_prompt += st.session_state["insert_var"]
+        st.session_state["insert_var"] = ""
+        st.experimental_rerun()
 """, height=160)
 else:
     template = st.text_area("Template Message", value="""
