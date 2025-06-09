@@ -73,6 +73,7 @@ else:
     vars["first_name"] = "there"
 
 
+
         if use_gpt:
             try:
                 prompt = gpt_prompt.format(**vars)
