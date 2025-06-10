@@ -74,8 +74,6 @@ if "gpt_prompt" not in st.session_state:
 # Display the GPT prompt text box
 st.text_area("Custom GPT Prompt", key="gpt_prompt", height=150)
 
-)
-
 if st.session_state["insert_var"] and use_gpt:
     st.session_state["gpt_prompt"] += st.session_state["insert_var"]
     st.session_state["insert_var"] = ""
