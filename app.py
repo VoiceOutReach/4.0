@@ -221,7 +221,7 @@ I have a candidate for the {hiring_for_job_title} role. Keep it under 60 words.
         gpt_prompt += st.session_state["insert_var"]
         st.session_state["insert_var"] = ""
         st.experimental_rerun()
-""", height=160)
+
 else:
  template = st.text_area("Template Message", value="
 Hi {first_name}, I saw you+ "re"+ hiring for {hiring_for_job_title} at {company_name}.
