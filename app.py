@@ -131,6 +131,10 @@ if st.button("🚀 Generate Messages + Voices"):
 
     df["final_message"] = messages
 
+st.markdown("### 📝 Preview Text Messages Before Voice Generation")
+for i, msg in enumerate(messages):
+    st.markdown(f"**{i+1}.** {msg}")
+
     st.markdown("### 🔊 Voice Note Previews")
     for mp3 in mp3_files:
         st.audio(mp3, format='audio/mp3')
