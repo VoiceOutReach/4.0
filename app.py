@@ -67,7 +67,11 @@ if use_gpt:
 Hi {first_name}, hope you're having a great day! I was checking out your work as the {position} at {company_name}, and I’ve got to say — it’s impressive. I saw you're hiring for a {hiring_for_job_title}, and it reminded me of someone who could be a great fit. Thought I’d reach out and see if you'd be open to a quick chat!
 """, height=150)
 
-    gpt_prompt = st.text_area("Custom GPT Prompt", value=default_prompt, key="gpt_prompt", height=150)
+    default_prompt = """
+Hi {first_name}, I hope you're doing well. I noticed your work as a {position} at {company_name} and wanted to connect because we’re working with a team hiring for {hiring_for_job_title}. Thought it might be relevant!
+"""
+
+gpt_prompt = st.text_area("Custom GPT Prompt", value=default_prompt, key="gpt_prompt", height=150)
 
     if st.session_state["insert_var"]:
         gpt_prompt += st.session_state["insert_var"]
@@ -75,8 +79,8 @@ Hi {first_name}, hope you're having a great day! I was checking out your work as
         st.experimental_rerun()
 else:
     template = st.text_area("Template Message", value="""
-Hi {first_name}, I saw you're hiring for {hiring_for_job_title} at {company_name}.
-{job_description} Let's connect!
+Hi {first_name}, I saw you're hiring for {hiring_for_job_title} at {company_name}. 
+Let's connect!
 """, height=150)
 
 if st.button("🚀 Generate Messages + Voices"):
