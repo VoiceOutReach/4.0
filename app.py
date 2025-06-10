@@ -21,7 +21,8 @@ client = openai.OpenAI()
 eleven_api_key = st.secrets["ELEVEN_API_KEY"]
 voice_id = st.secrets["VOICE_ID"]
 
-uploaded_file = st.file_uploader("Upload your leads CSV", type=["csv"])
+uploaded_file = st.file_uploader("Upload your leads CSV", type=["csv"], key="upload_csv")
+
 if not uploaded_file:
     st.stop()
 
