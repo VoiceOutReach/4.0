@@ -7,13 +7,16 @@ import os
 from zipfile import ZipFile
 from io import BytesIO
 
+# Page setup
 st.set_page_config(page_title="VoiceOutReach.ai", layout="wide")
 st.title("🎙️ VoiceOutReach.ai")
 
+# API setup
 client = openai.OpenAI()
 eleven_api_key = st.secrets["ELEVEN_API_KEY"]
 voice_id = st.secrets["VOICE_ID"]
 
+# CSV Upload
 uploaded_file = st.file_uploader("Upload your leads CSV", type=["csv"])
 if not uploaded_file:
     st.stop()
@@ -22,6 +25,7 @@ df = pd.read_csv(uploaded_file)
 df.columns = df.columns.str.lower().str.replace(" ", "_").str.replace("/", "_")
 st.write("📊 Sample Data", df.head())
 
+# Variable aliases
 alias_map = {
     "first_name": ["first_name", "First_Name"],
     "last_name": ["last_name"],
@@ -41,21 +45,24 @@ def resolve_var(row, key):
             return str(row[alias])
     return ""
 
+# Variable Suggestions
 available_vars = df.columns.tolist()
 st.markdown("### 🧩 Available Variables for GPT Prompt")
 st.code(", ".join([f"{{{v}}}" for v in available_vars]), language="python")
 
+# GPT vs Template toggle
 use_gpt = st.checkbox("Use GPT to generate full message", value=True)
-
 if "insert_var" not in st.session_state:
     st.session_state["insert_var"] = ""
 
+# Text Input UI
 if use_gpt:
     default_prompt = """Hi {first_name}, I noticed your role as a {position} at {company_name}. I'm working with a company hiring for {hiring_for_job_title}. Based on the job description — {job_description} — I think you’d really appreciate this opportunity. Want to hear more?"""
     gpt_prompt = st.text_area("Custom GPT Prompt", value=default_prompt, key="gpt_prompt", height=150)
 else:
     template = st.text_area("Template Message", value="Hi {first_name}, I hope you're doing well. I noticed your work as a {position} at {company_name} and wanted to connect because we’re working with a team hiring for {hiring_for_job_title}. Thought it might be relevant!", height=150)
 
+# Insert variable buttons
 st.markdown("### 🧩 Insert Variables into Your Prompt")
 cols = st.columns(len(available_vars))
 for i, var in enumerate(available_vars):
@@ -68,6 +75,7 @@ if st.session_state["insert_var"] and use_gpt:
     st.session_state["insert_var"] = ""
     st.experimental_rerun()
 
+# Main Processing
 if st.button("🚀 Generate Messages + Voices"):
     os.makedirs("voice_notes", exist_ok=True)
     mp3_files = []
@@ -102,14 +110,13 @@ if st.button("🚀 Generate Messages + Voices"):
                 message = "[Formatting Error]"
 
         messages.append(message)
-        
-style_degree = style_degrees[idx % len(style_degrees)]
 
+        # Voice generation
+        style_degree = style_degrees[idx % len(style_degrees)]
         headers = {
             "xi-api-key": eleven_api_key,
             "Content-Type": "application/json"
         }
-
         payload = {
             "text": message,
             "model_id": "eleven_multilingual_v2",
@@ -134,22 +141,13 @@ style_degree = style_degrees[idx % len(style_degrees)]
         else:
             st.warning(f"❌ ElevenLabs error on row {idx}: {res.text}")
 
-    # 📝 Show message preview
+    # Final output
     df["final_message"] = messages
+
     st.markdown("### 📝 Preview Text Messages Before Voice Generation")
     for i, msg in enumerate(messages):
         st.markdown(f"**{i+1}.** {msg}")
 
-else:
-    st.warning(f"❌ ElevenLabs error on row {idx}: {res.text}")
-
-
-df["final_message"] = messages
-st.markdown("### 📝 Preview Text Messages Before Voice Generation")
-for i, msg in enumerate(messages):
-    st.markdown(f"**{i+1}.** {msg}")
-
-    
     st.markdown("### 🔊 Voice Note Previews")
     for mp3 in mp3_files:
         st.audio(mp3, format='audio/mp3')
