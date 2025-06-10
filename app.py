@@ -71,9 +71,12 @@ if "gpt_prompt" not in st.session_state:
     st.session_state["gpt_prompt"] = """Hi {first_name}, thanks for connecting! I noticed your role as a {position} at {company_name}. I wanted to reach out because I came across the {hiring_for_job_title} role at your company. Based on the description — {job_description} — I think it aligns well with someone in my network. Mind if I share more?"""
 
 if use_gpt:
-    gpt_prompt = st.text_area("Custom GPT Prompt", value=st.session_state["gpt_prompt"], key="gpt_prompt", height=150)
-else:
-    template = st.text_area("Template Message", value="Hi {first_name}, I hope you're doing well. I noticed your work as a {position} at {company_name} and wanted to connect because we’re working with a team hiring for {hiring_for_job_title}. Thought it might be relevant!", height=150)
+   st.session_state["gpt_prompt"] = st.text_area(
+    "Custom GPT Prompt",
+    value=st.session_state["gpt_prompt"],
+    key="gpt_prompt",
+    height=150
+)
 
 if st.session_state["insert_var"] and use_gpt:
     st.session_state["gpt_prompt"] += st.session_state["insert_var"]
