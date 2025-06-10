@@ -125,14 +125,16 @@ if st.button("🚀 Generate Messages + Voices"):
             filename = f"voice_notes/{vars['first_name']}_{idx}.mp3"
             with open(filename, "wb") as f:
                 f.write(res.content)
-            mp3_files.append(filename)
-        else:
-            st.warning(f"❌ ElevenLabs error on row {idx}: {res.text}")
-df["final_message"] = messages
+                
+            df["final_message"] = messages
 
 st.markdown("### 📝 Preview Text Messages Before Voice Generation")
 for i, msg in enumerate(messages):
     st.markdown(f"**{i+1}.** {msg}")
+    
+            mp3_files.append(filename)
+        else:
+            st.warning(f"❌ ElevenLabs error on row {idx}: {res.text}")
 
     st.markdown("### 🔊 Voice Note Previews")
     for mp3 in mp3_files:
