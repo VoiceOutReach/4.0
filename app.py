@@ -129,8 +129,6 @@ if st.button("🚀 Generate Messages + Voices"):
         else:
             st.warning(f"❌ ElevenLabs error on row {idx}: {res.text}")
 
-    df["final_message"] = messages
-
 st.markdown("### 📝 Preview Text Messages Before Voice Generation")
 for i, msg in enumerate(messages):
     st.markdown(f"**{i+1}.** {msg}")
