@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import openai
@@ -7,7 +8,7 @@ from zipfile import ZipFile
 from io import BytesIO
 
 st.set_page_config(page_title="VoiceOutReach.ai", layout="wide")
-st.title("🎹 VoiceOutReach.ai")
+st.title("🎙️ VoiceOutReach.ai")
 
 client = openai.OpenAI()
 eleven_api_key = st.secrets["ELEVEN_API_KEY"]
@@ -41,35 +42,31 @@ def resolve_var(row, key):
     return ""
 
 available_vars = df.columns.tolist()
-st.markdown("### 🕉 Available Variables for GPT Prompt")
+st.markdown("### 🧩 Available Variables for GPT Prompt")
 st.code(", ".join([f"{{{v}}}" for v in available_vars]), language="python")
 
 use_gpt = st.checkbox("Use GPT to generate full message", value=True)
-
-st.markdown("### 🕉 Insert Variables into Your Prompt")
-for var in available_vars:
-    if st.button(f"Insert {{{var}}}", key=f"btn_{var}"):
-        st.session_state["insert_var"] = f"{{{var}}}"
 
 if "insert_var" not in st.session_state:
     st.session_state["insert_var"] = ""
 
 if use_gpt:
-    default_prompt = """
-Write a friendly and conversational LinkedIn message to {first_name}, who works as a {position} at {company_name}.
-Mention that we're helping a company hire for a {hiring_for_job_title} role and highlight a relevant point from the job description: {job_description}.
-Keep it concise and casual, like a real person would write.
-"""
+    default_prompt = """Hi {first_name}, I noticed your role as a {position} at {company_name}. I'm working with a company hiring for {hiring_for_job_title}. Based on the job description — {job_description} — I think you’d really appreciate this opportunity. Want to hear more?"""
     gpt_prompt = st.text_area("Custom GPT Prompt", value=default_prompt, key="gpt_prompt", height=150)
-
-    if st.session_state["insert_var"]:
-        gpt_prompt += st.session_state["insert_var"]
-        st.session_state["insert_var"] = ""
-        st.experimental_rerun()
 else:
-    template = st.text_area("Template Message", value="""
-Hi {first_name}, I hope you're doing well. I noticed your work as a {position} at {company_name} and wanted to connect because we’re working with a team hiring for {hiring_for_job_title}. Thought it might be relevant!
-""", height=150)
+    template = st.text_area("Template Message", value="Hi {first_name}, I hope you're doing well. I noticed your work as a {position} at {company_name} and wanted to connect because we’re working with a team hiring for {hiring_for_job_title}. Thought it might be relevant!", height=150)
+
+st.markdown("### 🧩 Insert Variables into Your Prompt")
+cols = st.columns(len(available_vars))
+for i, var in enumerate(available_vars):
+    with cols[i]:
+        if st.button(f"{{{var}}}", key=f"btn_{var}"):
+            st.session_state["insert_var"] = f"{{{var}}}"
+
+if st.session_state["insert_var"] and use_gpt:
+    st.session_state["gpt_prompt"] += st.session_state["insert_var"]
+    st.session_state["insert_var"] = ""
+    st.experimental_rerun()
 
 if st.button("🚀 Generate Messages + Voices"):
     os.makedirs("voice_notes", exist_ok=True)
@@ -88,7 +85,7 @@ if st.button("🚀 Generate Messages + Voices"):
 
         if use_gpt:
             try:
-                prompt = gpt_prompt.format(**vars)
+                prompt = st.session_state["gpt_prompt"].format(**vars)
                 response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[{"role": "user", "content": prompt}],
@@ -100,7 +97,7 @@ if st.button("🚀 Generate Messages + Voices"):
                 message = f"[GPT Error] {e}"
         else:
             try:
-                message = f"Hi {vars['first_name']}, " + template.format(**vars)
+                message = template.format(**vars)
             except:
                 message = "[Formatting Error]"
 
@@ -144,7 +141,7 @@ if st.button("🚀 Generate Messages + Voices"):
             zipf.write(mp3, arcname=os.path.basename(mp3))
     zip_buffer.seek(0)
 
-    st.download_button("📅 Download All Voice Notes", zip_buffer, "voice_notes.zip")
+    st.download_button("📥 Download All Voice Notes", zip_buffer, "voice_notes.zip")
 
     st.markdown("### ✅ Preview Messages")
     cols_to_show = [col for col in ["first_name", "company_name", "final_message"] if col in df.columns]
