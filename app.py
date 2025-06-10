@@ -6,7 +6,7 @@ import os
 from zipfile import ZipFile
 from io import BytesIO
 
-st.set_page_config(page_title="VoiceOutReach.ai", layout="wide")import streamlit as st
+import streamlit as st
 import pandas as pd
 import openai
 import requests
@@ -15,7 +15,7 @@ from zipfile import ZipFile
 from io import BytesIO
 
 st.set_page_config(page_title="VoiceOutReach.ai", layout="wide")
-st.title("🎹 VoiceOutReach.ai")
+st.title("🎙️ VoiceOutReach.ai")
 
 client = openai.OpenAI()
 eleven_api_key = st.secrets["ELEVEN_API_KEY"]
