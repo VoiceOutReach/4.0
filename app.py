@@ -102,12 +102,14 @@ if st.button("🚀 Generate Messages + Voices"):
                 message = "[Formatting Error]"
 
         messages.append(message)
+        
+style_degree = style_degrees[idx % len(style_degrees)]
 
-        style_degree = style_degrees[idx % len(style_degrees)]
         headers = {
             "xi-api-key": eleven_api_key,
             "Content-Type": "application/json"
         }
+
         payload = {
             "text": message,
             "model_id": "eleven_multilingual_v2",
@@ -117,17 +119,20 @@ if st.button("🚀 Generate Messages + Voices"):
                 "style_degree": style_degree
             }
         }
-res = requests.post(
-    f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
-    headers=headers,
-    json=payload
-)
 
-if res.status_code == 200:
-    filename = f"voice_notes/{vars['first_name']}_{idx}.mp3"
-    with open(filename, "wb") as f:
-        f.write(res.content)
-    mp3_files.append(filename)
+        res = requests.post(
+            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+            headers=headers,
+            json=payload
+        )
+
+        if res.status_code == 200:
+            filename = f"voice_notes/{vars['first_name']}_{idx}.mp3"
+            with open(filename, "wb") as f:
+                f.write(res.content)
+            mp3_files.append(filename)
+        else:
+            st.warning(f"❌ ElevenLabs error on row {idx}: {res.text}")
 
     # 📝 Show message preview
     df["final_message"] = messages
