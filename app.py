@@ -63,10 +63,9 @@ if "insert_var" not in st.session_state:
     st.session_state["insert_var"] = ""
 
 if use_gpt:
-    default_prompt = st.session_state.get("gpt_prompt", """
-Write a LinkedIn message to {first_name}, who is a {position} at {company_name}.
-I have a candidate for the {hiring_for_job_title} role. Keep it under 60 words.
-""")
+    template = st.text_area("Template Message", value="""
+Hi {first_name}, hope you're having a great day! I was checking out your work as the {position} at {company_name}, and I’ve got to say — it’s impressive. I saw you're hiring for a {hiring_for_job_title}, and it reminded me of someone who could be a great fit. Thought I’d reach out and see if you'd be open to a quick chat!
+""", height=150)
 
     gpt_prompt = st.text_area("Custom GPT Prompt", value=default_prompt, key="gpt_prompt", height=150)
 
