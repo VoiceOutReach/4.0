@@ -122,17 +122,15 @@ if st.button("🚀 Generate Messages + Voices"):
             headers=headers, json=payload)
 
         if res.status_code == 200:
-            filename = f"voice_notes/{vars['first_name']}_{idx}.mp3"
-            with open(filename, "wb") as f:
-                f.write(res.content)
-                
-            df["final_message"] = messages
+    filename = f"voice_notes/{vars['first_name']}_{idx}.mp3"
+    with open(filename, "wb") as f:
+        f.write(res.content)
+    df["final_message"] = messages
+    st.markdown("### 📝 Preview Text Messages Before Voice Generation")
+    for i, msg in enumerate(messages):
+        st.markdown(f"**{i+1}.** {msg}")
+    mp3_files.append(filename)
 
-st.markdown("### 📝 Preview Text Messages Before Voice Generation")
-for i, msg in enumerate(messages):
-    st.markdown(f"**{i+1}.** {msg}")
-    
-            mp3_files.append(filename)
         else:
             st.warning(f"❌ ElevenLabs error on row {idx}: {res.text}")
 
