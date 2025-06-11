@@ -85,12 +85,12 @@ if st.session_state["insert_var"] and use_gpt:
 
 # Message preview logic
 if st.button("📝 Generate Preview Messages"):
-    st.session_state["messages"] = messages
-
+    messages = []  # ✅ Initialize the list here
     for idx, row in df.iterrows():
         row = {k.lower().replace(" ", "_").replace("/", "_"): v for k, v in row.items()}
         vars = {key: resolve_var(row, key) for key in alias_map}
 
+        # Fix first_name fallback
         if vars.get("first_name"):
             vars["first_name"] = str(vars["first_name"]).split()[0]
         else:
@@ -99,28 +99,32 @@ if st.button("📝 Generate Preview Messages"):
         if use_gpt:
             try:
                 prompt = st.session_state["gpt_prompt"].format(**vars)
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=0.7,
-                    max_tokens=100
-                )
-                message = response.choices[0].message.content.strip()
-            except Exception as e:
-                message = f"[GPT Error] {e}"
+            except KeyError as e:
+                st.warning(f"⚠️ Missing variable in prompt: {e}")
+                prompt = st.session_state["gpt_prompt"]
+
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
+                max_tokens=100
+            )
+            message = f"Hi {vars['first_name']}, " + response.choices[0].message.content.strip()
         else:
             try:
                 message = template.format(**vars)
-            except:
+            except Exception:
                 message = "[Formatting Error]"
 
         messages.append(message)
 
-    df["final_message"] = messages
+    st.session_state["messages"] = messages  # ✅ Store for voice generation
 
+    # Show preview
     st.markdown("### 📝 Preview Text Messages Before Voice Generation")
     for i, msg in enumerate(messages):
         st.markdown(f"**{i+1}.** {msg}")
+
 
 # Voice generation logic
 if "messages" not in st.session_state or not st.session_state["messages"]:
