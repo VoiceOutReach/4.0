@@ -71,7 +71,7 @@ if "insert_var" not in st.session_state:
 if "gpt_prompt" not in st.session_state:
     st.session_state["gpt_prompt"] = """Write a casual LinkedIn message to {first_name}, who works as a {position} at {company_name}. I recently connected with them, and I noticed their team is hiring for a {hiring_for_job_title} role.
 
-Reference something from the job description: {job_description}, and let them know I might have someone who’s a great fit. Keep it warm, conversational, and under 60 words — like something a recruiter would actually send.
+Reference something from the job description: {job_description}, and let them know I might have someone who’s a great fit. Keep it warm, conversational, and under 100 words — like something a recruiter would actually send.
 """
 
 # Display the GPT prompt text box
