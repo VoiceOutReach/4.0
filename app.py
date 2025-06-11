@@ -130,25 +130,34 @@ if st.button("📝 Generate Preview Messages"):
 
 # Voice generation logic
 if st.button("🎤 Generate Voice Notes"):
-    if "messages" not in st.session_state or not st.session_state["messages"]:
-        st.warning("⚠️ Please generate messages first.")
+    if "messages" not in st.session_state:
+        st.warning("⚠️ Please generate preview messages first.")
         st.stop()
 
     messages = st.session_state["messages"]
-    mp3_files = []
     os.makedirs("voice_notes", exist_ok=True)
+    mp3_files = []
+    style_degrees = [1.0, 0.6]  # Voice tone variations
 
     for idx, row in df.iterrows():
         row = {k.lower().replace(" ", "_").replace("/", "_"): v for k, v in row.items()}
         vars = {key: resolve_var(row, key) for key in alias_map}
 
+        if vars.get("first_name"):
+            vars["first_name"] = str(vars["first_name"]).split()[0]
+        else:
+            vars["first_name"] = "there"
+
+        message = messages[idx]
         style_degree = style_degrees[idx % len(style_degrees)]
+
         headers = {
             "xi-api-key": eleven_api_key,
             "Content-Type": "application/json"
         }
+
         payload = {
-            "text": messages[idx],  # ✅ use saved message
+            "text": message,
             "model_id": "eleven_multilingual_v2",
             "voice_settings": {
                 "stability": 0.5,
@@ -171,10 +180,10 @@ if st.button("🎤 Generate Voice Notes"):
         else:
             st.warning(f"❌ ElevenLabs error on row {idx}: {res.text}")
 
+    # 🔊 Voice previews
     st.markdown("### 🔊 Voice Note Previews")
     for mp3 in mp3_files:
         st.audio(mp3, format='audio/mp3')
-
     zip_buffer = BytesIO()
     with ZipFile(zip_buffer, "w") as zipf:
         for mp3 in mp3_files:
