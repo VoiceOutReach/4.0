@@ -2,7 +2,8 @@
 # - New GPT prompt (post-connection outreach)
 # - Separate buttons for message preview and voice generation
 # - Fixed variable mapping
-# - Removed green tick preview section
+# - Added sender name input with Cheers line at the end (only if customized)
+# - Fixed variable insertion crash (removed experimental_rerun)
 
 import streamlit as st
 import pandas as pd
@@ -25,7 +26,11 @@ voice_id = st.secrets["VOICE_ID"]
 uploaded_file = st.file_uploader("Upload your leads CSV", type=["csv"])
 if not uploaded_file:
     st.stop()
+
+# Sender name input
 sender_name = st.text_input("Sender Name", value="Your Name")
+if sender_name.strip().lower() == "your name":
+    st.warning("⚠️ You haven't customized your sender name yet.")
 
 # Read and normalize column names
 df = pd.read_csv(uploaded_file)
@@ -86,11 +91,10 @@ for i, var in enumerate(available_vars):
         if st.button(f"{{{var}}}", key=f"btn_{var}"):
             st.session_state["insert_var"] = f"{{{var}}}"
 
-# Append variable to prompt if set
+# Append variable to prompt if set (no rerun)
 if st.session_state["insert_var"]:
     st.session_state["gpt_prompt"] += st.session_state["insert_var"]
     st.session_state["insert_var"] = ""
-    st.experimental_rerun()
 
 # Text prompt box
 st.text_area("Custom GPT Prompt", key="gpt_prompt", height=150)
@@ -126,6 +130,10 @@ if st.button("📝 Generate Preview Messages"):
             message = response.choices[0].message.content.strip()
         else:
             message = prompt
+
+        # Append Cheers only if user customized name
+        if "cheers" not in message.lower() and sender_name.strip().lower() != "your name":
+            message += f"\n\nCheers,\n{sender_name}"
 
         messages.append(message)
 
