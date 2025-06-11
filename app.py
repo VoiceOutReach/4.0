@@ -127,25 +127,18 @@ if st.button("📝 Generate Preview Messages"):
 
 
 # Voice generation logic
-if "messages" not in st.session_state or not st.session_state["messages"]:
-    st.warning("⚠️ Please generate messages first.")
-    st.stop()
-
-messages = st.session_state["messages"]
-
-if st.button("🎧 Generate Voice Notes"):
-    if "final_message" not in df.columns:
-        st.error("Please generate messages first.")
+if st.button("🎤 Generate Voice Notes"):
+    if "messages" not in st.session_state or not st.session_state["messages"]:
+        st.warning("⚠️ Please generate messages first.")
         st.stop()
 
-    os.makedirs("voice_notes", exist_ok=True)
+    messages = st.session_state["messages"]
     mp3_files = []
-    style_degrees = [1.0, 0.6]
+    os.makedirs("voice_notes", exist_ok=True)
 
-    for idx, message in enumerate(df["final_message"]):
-        row = df.iloc[idx]
-        row_dict = {k.lower().replace(" ", "_").replace("/", "_"): v for k, v in row.items()}
-        vars = {key: resolve_var(row_dict, key) for key in alias_map}
+    for idx, row in df.iterrows():
+        row = {k.lower().replace(" ", "_").replace("/", "_"): v for k, v in row.items()}
+        vars = {key: resolve_var(row, key) for key in alias_map}
 
         style_degree = style_degrees[idx % len(style_degrees)]
         headers = {
@@ -153,7 +146,7 @@ if st.button("🎧 Generate Voice Notes"):
             "Content-Type": "application/json"
         }
         payload = {
-            "text": message,
+            "text": messages[idx],  # ✅ use saved message
             "model_id": "eleven_multilingual_v2",
             "voice_settings": {
                 "stability": 0.5,
@@ -161,6 +154,7 @@ if st.button("🎧 Generate Voice Notes"):
                 "style_degree": style_degree
             }
         }
+
         res = requests.post(
             f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
             headers=headers,
