@@ -25,8 +25,6 @@ voice_id = st.secrets["VOICE_ID"]
 uploaded_file = st.file_uploader("Upload your leads CSV", type=["csv"])
 if not uploaded_file:
     st.stop()
-
-# ⬇️ ADD HERE
 sender_name = st.text_input("Sender Name", value="Your Name")
 
 # Read and normalize column names
