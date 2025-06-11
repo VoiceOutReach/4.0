@@ -55,6 +55,14 @@ available_vars = df.columns.tolist()
 
 # UI layout
 use_gpt = st.checkbox("Use GPT to generate full message", value=True)
+# Reset prompt to default when checkbox is ticked
+default_prompt = """Write a casual LinkedIn message to {first_name}, who works as a {position} at {company_name}. I recently connected with them, and I noticed their team is hiring for a {hiring_for_job_title} role.
+
+Reference something from the job description: {job_description}, and let them know I might have someone who’s a great fit. Keep it warm, conversational, and under 100 words — like something a recruiter would actually send.
+"""
+
+if use_gpt:
+    st.session_state["gpt_prompt"] = default_prompt
 
 st.markdown("### 🧩 Insert Variables into Your Prompt")
 cols = st.columns(len(available_vars))
