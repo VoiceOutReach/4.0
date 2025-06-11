@@ -86,6 +86,8 @@ if st.session_state["insert_var"] and use_gpt:
 # Message preview logic
 if st.button("📝 Generate Preview Messages"):
     messages = []  # ✅ Initialize the list here
+style_degrees = [1.0, 0.6]
+
     for idx, row in df.iterrows():
         row = {k.lower().replace(" ", "_").replace("/", "_"): v for k, v in row.items()}
         vars = {key: resolve_var(row, key) for key in alias_map}
