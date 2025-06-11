@@ -1,9 +1,9 @@
 # Cleaned and updated Streamlit app with:
-# - New GPT prompt (post-connection outreach)
-# - Separate buttons for message preview and voice generation
-# - Fixed variable mapping
-# - Added sender name input with Cheers line at the end (only if customized)
-# - Fixed variable insertion crash (removed experimental_rerun)
+# - GPT prompt customization
+# - Variable insertion without rerun crash
+# - Sender name input with dynamic Cheers line
+# - Fix for '[Your Name]' replacement
+# - Messages now persist after voice generation
 
 import streamlit as st
 import pandas as pd
@@ -69,6 +69,9 @@ if "default_prompt_loaded" not in st.session_state:
 if "insert_var" not in st.session_state:
     st.session_state["insert_var"] = ""
 
+if "messages" not in st.session_state:
+    st.session_state["messages"] = []
+
 # UI layout
 use_gpt = st.checkbox("Use GPT to generate full message")
 
@@ -101,14 +104,13 @@ st.text_area("Custom GPT Prompt", key="gpt_prompt", height=150)
 
 # Message preview logic
 if st.button("📝 Generate Preview Messages"):
-    messages = []  # ✅ Initialize the list here
+    messages = []
     style_degrees = [1.0, 0.6]
 
     for idx, row in df.iterrows():
         row = {k.lower().replace(" ", "_").replace("/", "_"): v for k, v in row.items()}
         vars = {key: resolve_var(row, key) for key in alias_map}
 
-        # Fix first_name fallback
         if vars.get("first_name"):
             vars["first_name"] = str(vars["first_name"]).split()[0]
         else:
@@ -131,29 +133,33 @@ if st.button("📝 Generate Preview Messages"):
         else:
             message = prompt
 
-        # Append Cheers only if user customized name
-        if "cheers" not in message.lower() and sender_name.strip().lower() != "your name":
+        message = message.replace("[Your Name]", sender_name)
+
+        if "cheers" in message.lower() and sender_name.lower() not in message.lower():
+            message = message.replace("Cheers", f"Cheers,\n{sender_name}")
+        elif "cheers" not in message.lower() and sender_name.strip().lower() != "your name":
             message += f"\n\nCheers,\n{sender_name}"
 
         messages.append(message)
 
-    st.session_state["messages"] = messages  # ✅ Store for voice generation
+    st.session_state["messages"] = messages
 
-    # Show preview
+# Show preview if messages exist
+if st.session_state["messages"]:
     st.markdown("### 📝 Preview Text Messages Before Voice Generation")
-    for i, msg in enumerate(messages):
+    for i, msg in enumerate(st.session_state["messages"]):
         st.markdown(f"**{i+1}.** {msg}")
 
 # Voice generation logic
 if st.button("🎤 Generate Voice Notes"):
-    if "messages" not in st.session_state:
+    if "messages" not in st.session_state or not st.session_state["messages"]:
         st.warning("⚠️ Please generate preview messages first.")
         st.stop()
 
     messages = st.session_state["messages"]
     os.makedirs("voice_notes", exist_ok=True)
     mp3_files = []
-    style_degrees = [1.0, 0.6]  # Voice tone variations
+    style_degrees = [1.0, 0.6]
 
     for idx, row in df.iterrows():
         row = {k.lower().replace(" ", "_").replace("/", "_"): v for k, v in row.items()}
@@ -196,10 +202,10 @@ if st.button("🎤 Generate Voice Notes"):
         else:
             st.warning(f"❌ ElevenLabs error on row {idx}: {res.text}")
 
-    # 🔊 Voice previews
     st.markdown("### 🔊 Voice Note Previews")
     for mp3 in mp3_files:
         st.audio(mp3, format='audio/mp3')
+
     zip_buffer = BytesIO()
     with ZipFile(zip_buffer, "w") as zipf:
         for mp3 in mp3_files:
