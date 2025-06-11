@@ -85,7 +85,7 @@ if st.session_state["insert_var"] and use_gpt:
 
 # Message preview logic
 if st.button("📝 Generate Preview Messages"):
-    messages = []
+    st.session_state["messages"] = messages
 
     for idx, row in df.iterrows():
         row = {k.lower().replace(" ", "_").replace("/", "_"): v for k, v in row.items()}
@@ -123,6 +123,12 @@ if st.button("📝 Generate Preview Messages"):
         st.markdown(f"**{i+1}.** {msg}")
 
 # Voice generation logic
+if "messages" not in st.session_state or not st.session_state["messages"]:
+    st.warning("⚠️ Please generate messages first.")
+    st.stop()
+
+messages = st.session_state["messages"]
+
 if st.button("🎧 Generate Voice Notes"):
     if "final_message" not in df.columns:
         st.error("Please generate messages first.")
