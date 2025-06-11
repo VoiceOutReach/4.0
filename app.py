@@ -111,7 +111,7 @@ if st.button("📝 Generate Preview Messages"):
                 temperature=0.7,
                 max_tokens=100
             )
-            message = f"Hi {vars['first_name']}, " + response.choices[0].message.content.strip()
+            message = response.choices[0].message.content.strip()
         else:
             try:
                 message = template.format(**vars)
