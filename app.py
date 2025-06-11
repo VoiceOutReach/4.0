@@ -82,7 +82,6 @@ if st.session_state["insert_var"] and use_gpt:
     st.session_state["insert_var"] = ""
     st.experimental_rerun()
 
-
 # Message preview logic
 if st.button("📝 Generate Preview Messages"):
     messages = []  # ✅ Initialize the list here
@@ -114,9 +113,9 @@ if st.button("📝 Generate Preview Messages"):
             message = response.choices[0].message.content.strip()
         else:
             try:
-                message = template.format(**vars)
-            except Exception:
-                message = "[Formatting Error]"
+                message = st.session_state["gpt_prompt"].format(**vars)
+            except Exception as e:
+                message = f"[Formatting Error: {str(e)}]"
 
         messages.append(message)
 
@@ -126,7 +125,6 @@ if st.button("📝 Generate Preview Messages"):
     st.markdown("### 📝 Preview Text Messages Before Voice Generation")
     for i, msg in enumerate(messages):
         st.markdown(f"**{i+1}.** {msg}")
-
 
 # Voice generation logic
 if st.button("🎤 Generate Voice Notes"):
