@@ -53,16 +53,30 @@ def resolve_var(row, key):
 
 available_vars = df.columns.tolist()
 
+# Initialize session state keys
+if "gpt_prompt" not in st.session_state:
+    st.session_state["gpt_prompt"] = ""
+
+if "default_prompt_loaded" not in st.session_state:
+    st.session_state["default_prompt_loaded"] = False
+
+if "insert_var" not in st.session_state:
+    st.session_state["insert_var"] = ""
+
 # UI layout
-use_gpt = st.checkbox("Use GPT to generate full message", value=True)
-# Reset prompt to default when checkbox is ticked
+use_gpt = st.checkbox("Use GPT to generate full message")
+
+# Insert default prompt only when GPT mode is turned on
 default_prompt = """Write a casual LinkedIn message to {first_name}, who works as a {position} at {company_name}. I recently connected with them, and I noticed their team is hiring for a {hiring_for_job_title} role.
 
 Reference something from the job description: {job_description}, and let them know I might have someone who’s a great fit. Keep it warm, conversational, and under 100 words — like something a recruiter would actually send.
 """
 
-if use_gpt:
+if use_gpt and not st.session_state["default_prompt_loaded"]:
     st.session_state["gpt_prompt"] = default_prompt
+    st.session_state["default_prompt_loaded"] = True
+elif not use_gpt:
+    st.session_state["default_prompt_loaded"] = False
 
 st.markdown("### 🧩 Insert Variables into Your Prompt")
 cols = st.columns(len(available_vars))
@@ -71,24 +85,14 @@ for i, var in enumerate(available_vars):
         if st.button(f"{{{var}}}", key=f"btn_{var}"):
             st.session_state["insert_var"] = f"{{{var}}}"
 
-if "insert_var" not in st.session_state:
-    st.session_state["insert_var"] = ""
-
-# Text prompt boxes
-# Initialize default prompt if not already set
-if "gpt_prompt" not in st.session_state:
-    st.session_state["gpt_prompt"] = """Write a casual LinkedIn message to {first_name}, who works as a {position} at {company_name}. I recently connected with them, and I noticed their team is hiring for a {hiring_for_job_title} role.
-
-Reference something from the job description: {job_description}, and let them know I might have someone who’s a great fit. Keep it warm, conversational, and under 100 words — like something a recruiter would actually send.
-"""
-
-# Display the GPT prompt text box
-st.text_area("Custom GPT Prompt", key="gpt_prompt", height=150)
-
-if st.session_state["insert_var"] and use_gpt:
+# Append variable to prompt if set
+if st.session_state["insert_var"]:
     st.session_state["gpt_prompt"] += st.session_state["insert_var"]
     st.session_state["insert_var"] = ""
     st.experimental_rerun()
+
+# Text prompt box
+st.text_area("Custom GPT Prompt", key="gpt_prompt", height=150)
 
 # Message preview logic
 if st.button("📝 Generate Preview Messages"):
@@ -105,13 +109,13 @@ if st.button("📝 Generate Preview Messages"):
         else:
             vars["first_name"] = "there"
 
-        if use_gpt:
-            try:
-                prompt = st.session_state["gpt_prompt"].format(**vars)
-            except KeyError as e:
-                st.warning(f"⚠️ Missing variable in prompt: {e}")
-                prompt = st.session_state["gpt_prompt"]
+        try:
+            prompt = st.session_state["gpt_prompt"].format(**vars)
+        except KeyError as e:
+            st.warning(f"⚠️ Missing variable in prompt: {e}")
+            prompt = st.session_state["gpt_prompt"]
 
+        if use_gpt:
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt}],
@@ -120,10 +124,7 @@ if st.button("📝 Generate Preview Messages"):
             )
             message = response.choices[0].message.content.strip()
         else:
-            try:
-                message = st.session_state["gpt_prompt"].format(**vars)
-            except Exception as e:
-                message = f"[Formatting Error: {str(e)}]"
+            message = prompt
 
         messages.append(message)
 
