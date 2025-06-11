@@ -142,7 +142,7 @@ if st.button("🎤 Generate Voice Notes"):
         row = {k.lower().replace(" ", "_").replace("/", "_"): v for k, v in row.items()}
         vars = {key: resolve_var(row, key) for key in alias_map}
 
-
+    style_degree = style_degrees[idx % len(style_degrees)]
         headers = {
             "xi-api-key": eleven_api_key,
             "Content-Type": "application/json"
