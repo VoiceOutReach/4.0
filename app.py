@@ -69,7 +69,9 @@ if "insert_var" not in st.session_state:
 # Text prompt boxes
 # Initialize default prompt if not already set
 if "gpt_prompt" not in st.session_state:
-    st.session_state["gpt_prompt"] = """Hi {first_name}, thanks for connecting! I noticed your role as a {position} at {company_name}. I wanted to reach out because I came across the {hiring_for_job_title} role at your company. Based on the description — {job_description} — I think it aligns well with someone in my network. Mind if I share more?"""
+    st.session_state["gpt_prompt"] = """Write a short LinkedIn message to {first_name}, who is a {position} at {company_name}. You recently connected with them, and now you're reaching out because you saw a job opening for the {hiring_for_job_title} role at their company.
+
+Mention that the role stood out because: {job_description}. Say you might know someone who’s a great fit, and ask if they'd be open to hearing more. Keep the tone warm, casual, and under 60 words."""
 
 # Display the GPT prompt text box
 st.text_area("Custom GPT Prompt", key="gpt_prompt", height=150)
