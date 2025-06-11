@@ -26,6 +26,9 @@ uploaded_file = st.file_uploader("Upload your leads CSV", type=["csv"])
 if not uploaded_file:
     st.stop()
 
+# ⬇️ ADD HERE
+sender_name = st.text_input("Sender Name", value="Your Name")
+
 # Read and normalize column names
 df = pd.read_csv(uploaded_file)
 df.columns = df.columns.str.lower().str.replace(" ", "_").str.replace("/", "_")
