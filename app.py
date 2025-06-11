@@ -4,6 +4,7 @@
 # - Sender name input with dynamic Cheers line
 # - Fix for '[Your Name]' replacement
 # - Messages now persist after voice generation
+# - Voice note URLs now point to hosted Vercel site
 
 import streamlit as st
 import pandas as pd
@@ -159,6 +160,7 @@ if st.button("🎤 Generate Voice Notes"):
     messages = st.session_state["messages"]
     os.makedirs("voice_notes", exist_ok=True)
     mp3_files = []
+    hosted_links = []
     style_degrees = [1.0, 0.6]
 
     for idx, row in df.iterrows():
@@ -195,17 +197,23 @@ if st.button("🎤 Generate Voice Notes"):
         )
 
         if res.status_code == 200:
-            filename = f"voice_notes/{vars['first_name']}_{idx}.mp3"
+            file_id = f"{vars['first_name']}_{idx}"
+            filename = f"voice_notes/{file_id}.mp3"
             with open(filename, "wb") as f:
                 f.write(res.content)
             mp3_files.append(filename)
+            # ⬇️ Link to hosted player
+            hosted_links.append(f"https://voiceoutreach.vercel.app/voice?id={file_id}")
         else:
             st.warning(f"❌ ElevenLabs error on row {idx}: {res.text}")
 
+    # 🔊 Voice previews
     st.markdown("### 🔊 Voice Note Previews")
-    for mp3 in mp3_files:
+    for i, mp3 in enumerate(mp3_files):
         st.audio(mp3, format='audio/mp3')
+        st.markdown(f"🔗 [Voice Link]({hosted_links[i]})")
 
+    # ZIP download
     zip_buffer = BytesIO()
     with ZipFile(zip_buffer, "w") as zipf:
         for mp3 in mp3_files:
