@@ -21,10 +21,7 @@ def upload_to_github(filename, repo_path):
 
     # Check if file already exists (get SHA)
     get_res = requests.get(api_url, headers=headers)
-    if get_res.status_code == 200:
-        sha = get_res.json()["sha"]
-    else:
-        sha = None
+    sha = get_res.json()["sha"] if get_res.status_code == 200 else None
 
     data = {
         "message": f"Add {os.path.basename(filename)}",
