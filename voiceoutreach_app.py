@@ -214,7 +214,10 @@ if st.button("🎤 Generate Voice Notes"):
             github_path = f"public/voices/{file_id}.mp3"
             upload_to_github(filename, github_path)
             mp3_files.append(filename)
-            hosted_links.append(f"https://voiceoutreach.ai/voicenote/{file_id}")
+            import uuid
+            ...
+            hosted_links.append(f"https://voiceoutreach.ai/voicenote/{file_id}.mp3?v={uuid.uuid4()}")
+
         else:
             st.warning(f"ElevenLabs error on row {idx}: {res.text}")
 
