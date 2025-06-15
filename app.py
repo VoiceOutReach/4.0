@@ -203,7 +203,7 @@ if st.button("🎤 Generate Voice Notes"):
                 f.write(res.content)
             mp3_files.append(filename)
             # ⬇️ Link to hosted player
-            hosted_links.append(f"https://voiceoutreach-player.vercel.app/voice?id={file_id}")
+            hosted_links.append(f"https://www.voiceoutreach.ai/voicenote/{file_id}")
         else:
             st.warning(f"❌ ElevenLabs error on row {idx}: {res.text}")
 
