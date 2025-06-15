@@ -228,7 +228,7 @@ if st.button("🎤 Generate Voice Notes"):
             with open(filename, "wb") as f:
                 f.write(res.content)
             # 🪄 Auto-copy to Vercel hosted folder
-            vercel_path = f"../voiceoutreach-player/public/voices/{file_id}.mp3"
+            vercel_path = f"/Users/hassanamjad/Desktop/VoiceOutReach/public/voices/{file_id}.mp3"
             try:
                 os.makedirs(os.path.dirname(vercel_path), exist_ok=True)
                 with open(vercel_path, "wb") as vf:
