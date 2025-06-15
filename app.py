@@ -12,6 +12,7 @@ import pandas as pd
 import openai
 import requests
 import os
+import random
 from zipfile import ZipFile
 from io import BytesIO
 
