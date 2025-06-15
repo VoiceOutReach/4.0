@@ -1,3 +1,4 @@
+
 # Cleaned and updated Streamlit app with:
 # - GPT prompt customization
 # - Variable insertion without rerun crash
@@ -13,6 +14,36 @@ import requests
 import os
 from zipfile import ZipFile
 from io import BytesIO
+
+# 🧹 Enhance pacing in generated voice message
+def enhance_pacing(text):
+    text = text.replace('. ', '.\n')
+    text = text.replace(', ', ',\n')
+    pause_triggers = ["Hi ", "Hey ", "Thanks for", "I noticed", "Let me know"]
+    for trigger in pause_triggers:
+        text = text.replace(trigger, f"{trigger}\n")
+    return text
+
+# ✂️ Split long sentences to improve voice rhythm
+def split_long_sentences(text, max_words=15):
+    sentences = text.split(". ")
+    broken = []
+    for s in sentences:
+        words = s.split()
+        if len(words) > max_words:
+            mid = len(words) // 2
+            broken.append(" ".join(words[:mid]) + ".")
+            broken.append(" ".join(words[mid:]))
+        else:
+            broken.append(s)
+    return ". ".join(broken)
+
+
+# 🧹 Enhance pacing in generated voice message
+def enhance_pacing(text):
+    text = text.replace('. ', '.\n')
+    text = text.replace(', ', ',\n')
+    return text
 
 # Basic setup
 st.set_page_config(page_title="VoiceOutReach.ai", layout="wide")
@@ -172,8 +203,11 @@ if st.button("🎤 Generate Voice Notes"):
         else:
             vars["first_name"] = "there"
 
-        message = messages[idx]
+        message = enhance_pacing(messages[idx])
+        message = split_long_sentences(messages[idx])
+        message = enhance_pacing(message)
         style_degree = style_degrees[idx % len(style_degrees)]
+        style_degree = round(random.uniform(0.5, 0.8), 2)
 
         headers = {
             "xi-api-key": eleven_api_key,
@@ -202,18 +236,15 @@ if st.button("🎤 Generate Voice Notes"):
             with open(filename, "wb") as f:
                 f.write(res.content)
             mp3_files.append(filename)
-            # ⬇️ Link to hosted player
             hosted_links.append(f"https://www.voiceoutreach.ai/voicenote/{file_id}")
         else:
             st.warning(f"❌ ElevenLabs error on row {idx}: {res.text}")
 
-    # 🔊 Voice previews
     st.markdown("### 🔊 Voice Note Previews")
     for i, mp3 in enumerate(mp3_files):
         st.audio(mp3, format='audio/mp3')
         st.markdown(f"🔗 [Voice Link]({hosted_links[i]})")
 
-    # ZIP download
     zip_buffer = BytesIO()
     with ZipFile(zip_buffer, "w") as zipf:
         for mp3 in mp3_files:
