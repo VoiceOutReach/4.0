@@ -39,13 +39,6 @@ def split_long_sentences(text, max_words=15):
             broken.append(s)
     return ". ".join(broken)
 
-
-# 🧹 Enhance pacing in generated voice message
-def enhance_pacing(text):
-    text = text.replace('. ', '.\n')
-    text = text.replace(', ', ',\n')
-    return text
-
 # Basic setup
 st.set_page_config(page_title="VoiceOutReach.ai", layout="wide")
 st.title("🎙️ VoiceOutReach.ai")
@@ -204,10 +197,8 @@ if st.button("🎤 Generate Voice Notes"):
         else:
             vars["first_name"] = "there"
 
-        message = enhance_pacing(messages[idx])
         message = split_long_sentences(messages[idx])
         message = enhance_pacing(message)
-        style_degree = style_degrees[idx % len(style_degrees)]
         style_degree = round(random.uniform(0.5, 0.8), 2)
 
         headers = {
@@ -236,6 +227,14 @@ if st.button("🎤 Generate Voice Notes"):
             filename = f"voice_notes/{file_id}.mp3"
             with open(filename, "wb") as f:
                 f.write(res.content)
+            # 🪄 Auto-copy to Vercel hosted folder
+            vercel_path = f"../voiceoutreach-player/public/voices/{file_id}.mp3"
+            try:
+                os.makedirs(os.path.dirname(vercel_path), exist_ok=True)
+                with open(vercel_path, "wb") as vf:
+                    vf.write(res.content)
+            except Exception as e:
+                st.warning(f"⚠️ Failed to copy to Vercel folder: {e}")
             mp3_files.append(filename)
             hosted_links.append(f"https://www.voiceoutreach.ai/voicenote/{file_id}")
         else:
