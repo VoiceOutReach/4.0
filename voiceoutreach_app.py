@@ -12,6 +12,9 @@ from io import BytesIO
 
 # ✨ GitHub upload function
 def upload_to_github(filename, repo_path):
+    import requests
+    import base64
+
     with open(filename, "rb") as f:
         content = f.read()
     b64_content = base64.b64encode(content).decode("utf-8")
@@ -21,12 +24,19 @@ def upload_to_github(filename, repo_path):
         f"{st.secrets['GITHUB_USERNAME']}/"
         f"{st.secrets['GITHUB_REPO']}/contents/{repo_path}"
     )
+    
+    # 👇 Add debug print
+    print("📦 Uploading to:", api_url)
+
     headers = {
         "Authorization": f"Bearer {st.secrets['GITHUB_TOKEN']}",
         "Accept": "application/vnd.github+json"
     }
 
     get_res = requests.get(api_url, headers=headers)
+    print("🔍 GET status code:", get_res.status_code)
+    print("🔍 GET response:", get_res.json())
+
     sha = get_res.json().get("sha") if get_res.status_code == 200 else None
 
     data = {
@@ -38,6 +48,10 @@ def upload_to_github(filename, repo_path):
         data["sha"] = sha
 
     put_res = requests.put(api_url, headers=headers, json=data)
+
+    print("🚀 PUT status:", put_res.status_code)
+    print("🚀 PUT response:", put_res.json())
+
     if put_res.status_code not in (200, 201):
         st.warning(f"GitHub upload failed: {put_res.status_code}")
 
