@@ -215,7 +215,7 @@ if st.button("🎤 Generate Voice Notes"):
     file_id = f"{vars['first_name']}_{idx}"
     filename = f"voice_notes/{file_id}.mp3"
 
-    # ✅ Only proceed if voice note is valid length
+    # ✅ Only proceed if voice note is valid
     if len(res.content) > 5000:
         with open(filename, "wb") as f:
             f.write(res.content)
@@ -228,7 +228,6 @@ if st.button("🎤 Generate Voice Notes"):
         st.warning(f"⚠️ Voice content too short for {file_id}, skipping.")
 else:
     st.warning(f"❌ ElevenLabs error on row {idx}: {res.text}")
-
 
         # ✅ Use the correct clean voice link
         hosted_links.append(f"https://voiceoutreach.ai/voice/{file_id}")
