@@ -49,7 +49,7 @@ def upload_to_github(filename, repo_path):
 # 🧠 Voice pacing helpers
 def enhance_pacing(text):
     text = text.replace('. ', '. ')
-     text = text.replace(', ', ', ')
+    text = text.replace(', ', ', ')
     for trigger in ["Hi ", "Hey ", "Thanks", "Let me know", "I noticed"]:
         text = text.replace(trigger, f"{trigger}... ")
     return text
