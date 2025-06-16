@@ -8,6 +8,9 @@ import base64
 from zipfile import ZipFile
 from io import BytesIO
 
+st.set_page_config(page_title="VoiceOutReach.ai", layout="wide")
+st.title("🎙️ VoiceOutReach.ai")
+
 # 🌟 GitHub upload function
 def upload_to_github(filename, repo_path):
     import base64
@@ -79,10 +82,6 @@ def split_long_sentences(text, max_words=15):
         else:
             broken.append(s)
     return ". ".join(broken)
-
-# 🚀 Streamlit app setup
-st.set_page_config(page_title="VoiceOutReach.ai", layout="wide")
-st.title("🎙️ VoiceOutReach.ai")
 
 client = openai.OpenAI()
 eleven_api_key = st.secrets["ELEVEN_API_KEY"]
