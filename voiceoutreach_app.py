@@ -20,7 +20,7 @@ def upload_to_github(filename, repo_path):
         content = f.read()
     b64_content = base64.b64encode(content).decode("utf-8")
 
-    # ✅ THIS must come BEFORE the try block
+    # ✅ Define api_url BEFORE any try or request
     api_url = (
         f"https://api.github.com/repos/"
         f"{st.secrets['GITHUB_USERNAME']}/"
@@ -32,47 +32,12 @@ def upload_to_github(filename, repo_path):
         "Accept": "application/vnd.github+json"
     }
 
-    get_res = requests.get(api_url, headers=headers)
-    sha = get_res.json().get("sha") if get_res.status_code == 200 else None
-
-    data = {
-        "message": f"Add {os.path.basename(filename)}",
-        "branch": st.secrets["GITHUB_BRANCH"],
-        "content": b64_content
-    }
-    if sha:
-        data["sha"] = sha
-
     try:
-        # ✅ Now it's defined above — no more error
-        put_res = requests.put(api_url, headers=headers, json=data)
-        if put_res.status_code not in (200, 201):
-            st.error(f"❌ GitHub upload failed: {put_res.status_code}")
-            st.code(put_res.text, language='json')
-    except Exception as e:
-        st.error("🚨 Failed to connect to GitHub.")
-        st.code(str(e))
+        get_res = requests.get(api_url, headers=headers)
+        sha = get_res.json().get("sha") if get_res.status_code == 200 else None
 
-
-    # ✅ Add this block at the end
-    try:
-        put_res = requests.put(api_url, headers=headers, json=data)
-        if put_res.status_code not in (200, 201):
-            st.error(f"❌ GitHub upload failed: {put_res.status_code}")
-            st.code(put_res.text, language='json')
-    except Exception as e:
-        st.error("🚨 Failed to connect to GitHub.")
-        st.code(str(e))
-
-try:
-    put_res = requests.put(api_url, headers=headers, json=data)
-    if put_res.status_code not in (200, 201):
-        st.error(f"❌ GitHub upload failed: {put_res.status_code}")
-        st.code(put_res.text, language='json')
-except Exception as e:
-    st.error("🚨 Failed to connect to GitHub.")
-    st.code(str(e))
-
+        data = {
+            "message": f"Add {os
 
 # 🧠 Voice pacing helpers
 def enhance_pacing(text):
