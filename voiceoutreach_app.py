@@ -10,6 +10,9 @@ from io import BytesIO
 
 # 🌟 GitHub upload function
 def upload_to_github(filename, repo_path):
+    import base64
+    import requests
+
     with open(filename, "rb") as f:
         content = f.read()
     b64_content = base64.b64encode(content).decode("utf-8")
@@ -35,6 +38,16 @@ def upload_to_github(filename, repo_path):
     }
     if sha:
         data["sha"] = sha
+
+    # ✅ Add this block at the end
+    try:
+        put_res = requests.put(api_url, headers=headers, json=data)
+        if put_res.status_code not in (200, 201):
+            st.error(f"❌ GitHub upload failed: {put_res.status_code}")
+            st.code(put_res.text, language='json')
+    except Exception as e:
+        st.error("🚨 Failed to connect to GitHub.")
+        st.code(str(e))
 
 try:
     put_res = requests.put(api_url, headers=headers, json=data)
