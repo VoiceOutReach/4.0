@@ -211,15 +211,24 @@ if st.button("🎤 Generate Voice Notes"):
             json=payload
         )
 
-        if res.status_code == 200:
-            file_id = f"{vars['first_name']}_{idx}"
-            filename = f"voice_notes/{file_id}.mp3"
-            with open(filename, "wb") as f:
-                f.write(res.content)
-            github_path = f"public/voices/{file_id}.mp3"
-            upload_to_github(filename, github_path)
-            mp3_files.append(filename)
-            hosted_links.append(f"https://voiceoutreach.ai/voicenote/{file_id}.mp3?v={uuid.uuid4()}")
+        if res.status_code == 200 and res.content:
+    file_id = f"{vars['first_name']}_{idx}"
+    filename = f"voice_notes/{file_id}.mp3"
+
+    # ✅ Only proceed if voice note is valid
+    if len(res.content) > 5000:
+        with open(filename, "wb") as f:
+            f.write(res.content)
+
+        github_path = f"public/voices/{file_id}.mp3"
+        upload_to_github(filename, github_path)
+        mp3_files.append(filename)
+
+        # ✅ Use the correct clean voice link
+        hosted_links.append(f"https://voiceoutreach.ai/voice/{file_id}")
+    else:
+        st.warning(f"Voice content too short for {file_id}, skipping.")
+
         else:
             st.warning(f"ElevenLabs error on row {idx}: {res.text}")
 
