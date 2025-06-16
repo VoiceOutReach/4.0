@@ -9,7 +9,7 @@ from zipfile import ZipFile
 from io import BytesIO
 
 st.set_page_config(page_title="VoiceOutReach.ai", layout="wide")
-st.title("🎧 VoiceOutReach.ai")
+st.title("🎙️ VoiceOutReach.ai")
 
 # 🌟 GitHub upload function
 def upload_to_github(filename, repo_path):
@@ -75,7 +75,7 @@ uploaded_file = st.file_uploader("Upload your leads CSV", type=["csv"])
 if not uploaded_file:
     st.stop()
 
-# 🧐 Sender
+# 🧍 Sender
 sender_name = st.text_input("Sender Name", value="Your Name")
 if sender_name.strip().lower() == "your name":
     st.warning("⚠️ You haven't customized your sender name yet.")
@@ -112,7 +112,8 @@ use_gpt = st.checkbox("Use GPT to generate full message")
 
 def_prompt = """Write a short and friendly LinkedIn message to {first_name}, who is a {position} at {company_name}. I just connected with them and saw their team is hiring for a {hiring_for_job_title} role.
 
-Let them know I might know someone who’s a fit. Keep it under 100 words and sound human — avoid buzzwords like “AI-driven campaigns” or “strong background”."""
+Based on this job description: {job_description}, mention a specific responsibility or tool, and casually let them know I might know someone who’s a fit. Keep it under 100 words and sound human — avoid buzzwords like “AI-driven campaigns” or “strong background”
+."""
 
 if use_gpt and not st.session_state.get("default_prompt_loaded", False):
     st.session_state["gpt_prompt"] = def_prompt
@@ -154,13 +155,12 @@ if st.button("📝 Generate Preview Messages"):
         else:
             message = prompt
 
-        # 📊 Add sign-off if none exists
+        # Normalize message for checking
         msg_lower = message.strip().lower()
-        has_signature = any(phrase in msg_lower for phrase in [
-            "cheers", "best", "regards", "thanks", "sincerely"
-        ])
-        if not has_signature and sender_name.strip().lower() != "your name":
-            message += f"\n\nCheers,\n{sender_name}"
+
+        # Replace placeholder name if GPT added it lazily
+        if "[your name]" in message:
+            message = message.replace("[Your Name]", sender_name).replace("[your name]", sender_name)
 
         messages.append(message)
 
@@ -195,9 +195,9 @@ if st.button("🎤 Generate Voice Notes"):
             "text": message,
             "model_id": "eleven_multilingual_v2",
             "voice_settings": {
-                "stability": 0.7,
+                "stability": 0.55,
                 "similarity_boost": 0.85,
-                "style": 0.45
+                "style": 0.65
             }
         }
 
@@ -240,4 +240,4 @@ if st.button("🎤 Generate Voice Notes"):
             zipf.write(mp3, arcname=os.path.basename(mp3))
     zip_buffer.seek(0)
 
-    st.download_button("🗕️ Download All Voice Notes", zip_buffer, "voice_notes.zip")
+    st.download_button("📅 Download All Voice Notes", zip_buffer, "voice_notes.zip")
