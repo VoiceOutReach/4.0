@@ -189,9 +189,11 @@ if st.button("🎤 Generate Voice Notes"):
             "text": message,
             "model_id": "eleven_multilingual_v2",
             "voice_settings": {
-                "stability": 0.5,
-                "similarity_boost": 0.7,
-                "style_degree": style_degree
+                "stability": 0.3,             # More expressive
+                "similarity_boost": 0.6,
+                "style_degree": 0.3           # Lower = slower & softer
+            }
+
             }
         }
 
