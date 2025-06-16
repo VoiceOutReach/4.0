@@ -156,8 +156,17 @@ if st.button("📝 Generate Preview Messages"):
         else:
             message = prompt
 
-        if "cheers" not in message.lower() and sender_name.strip().lower() != "your name":
-            message += f"\n\nCheers,\n{sender_name}"
+        # Normalize message for checking
+msg_lower = message.strip().lower()
+
+# Check for any common sign-off phrases
+has_signature = any(phrase in msg_lower for phrase in [
+    "cheers", "best", "regards", "thanks", "sincerely"
+])
+
+if not has_signature and sender_name.strip().lower() != "your name":
+    message += f"\n\nCheers,\n{sender_name}"
+
 
         messages.append(message)
 
