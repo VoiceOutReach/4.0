@@ -13,14 +13,10 @@ st.title("🎙️ VoiceOutReach.ai")
 
 # 🌟 GitHub upload function
 def upload_to_github(filename, repo_path):
-    import base64
-    import requests
-
     with open(filename, "rb") as f:
         content = f.read()
     b64_content = base64.b64encode(content).decode("utf-8")
 
-    # ✅ Define api_url BEFORE any try or request
     api_url = (
         f"https://api.github.com/repos/"
         f"{st.secrets['GITHUB_USERNAME']}/"
@@ -37,7 +33,18 @@ def upload_to_github(filename, repo_path):
         sha = get_res.json().get("sha") if get_res.status_code == 200 else None
 
         data = {
-            "message": f"Add {os
+            "message": f"Add {os.path.basename(filename)}",
+            "content": b64_content,
+            "branch": "main"
+        }
+        if sha:
+            data["sha"] = sha
+
+        res = requests.put(api_url, headers=headers, json=data)
+        if res.status_code not in [200, 201]:
+            st.error(f"GitHub upload failed: {res.text}")
+    except Exception as e:
+        st.error(f"Upload error: {e}")
 
 # 🧠 Voice pacing helpers
 def enhance_pacing(text):
