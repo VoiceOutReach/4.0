@@ -1,5 +1,3 @@
-# ✅ Clean VoiceOutReach App with GitHub Upload Integration
-
 import streamlit as st
 import pandas as pd
 import openai
@@ -9,9 +7,8 @@ import random
 import base64
 from zipfile import ZipFile
 from io import BytesIO
-import uuid
 
-# ✨ GitHub upload function (cleaned)
+# 🌟 GitHub upload function
 def upload_to_github(filename, repo_path):
     with open(filename, "rb") as f:
         content = f.read()
@@ -40,13 +37,10 @@ def upload_to_github(filename, repo_path):
         data["sha"] = sha
 
     put_res = requests.put(api_url, headers=headers, json=data)
+    if put_res.status_code not in (200, 201):
+        st.warning(f"❌ GitHub upload failed: {put_res.status_code}")
 
-    if put_res.status_code in (200, 201):
-        st.success("✅ Uploaded voice note to GitHub.")
-    else:
-        st.error(f"❌ GitHub upload failed: {put_res.status_code}")
-
-# 🧠 Pacing + Sentence helpers
+# 🧠 Voice pacing helpers
 def enhance_pacing(text):
     text = text.replace('. ', '.\n')
     text = text.replace(', ', ',\n')
@@ -67,9 +61,9 @@ def split_long_sentences(text, max_words=15):
             broken.append(s)
     return ". ".join(broken)
 
-# 🧠 Streamlit app setup
+# 🚀 Streamlit app setup
 st.set_page_config(page_title="VoiceOutReach.ai", layout="wide")
-st.title("🎧 VoiceOutReach.ai")
+st.title("🎙️ VoiceOutReach.ai")
 
 client = openai.OpenAI()
 eleven_api_key = st.secrets["ELEVEN_API_KEY"]
@@ -106,19 +100,18 @@ available_vars = df.columns.tolist()
 # 🔄 Session State
 if "gpt_prompt" not in st.session_state:
     st.session_state["gpt_prompt"] = ""
-
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
 # 🧠 Prompt UI
 use_gpt = st.checkbox("Use GPT to generate full message")
 
-default_prompt = """Write a casual LinkedIn message to {first_name}, who works as a {position} at {company_name}. I recently connected with them, and I noticed their team is hiring for a {hiring_for_job_title} role.
+def_prompt = """Write a casual LinkedIn message to {first_name}, who works as a {position} at {company_name}. I recently connected with them, and I noticed their team is hiring for a {hiring_for_job_title} role.
 
 Reference something from the job description: {job_description}, and let them know I might have someone who’s a great fit. Keep it warm, conversational, and under 100 words — like something a recruiter would actually send."""
 
 if use_gpt and not st.session_state.get("default_prompt_loaded", False):
-    st.session_state["gpt_prompt"] = default_prompt
+    st.session_state["gpt_prompt"] = def_prompt
     st.session_state["default_prompt_loaded"] = True
 elif not use_gpt:
     st.session_state["default_prompt_loaded"] = False
@@ -170,7 +163,7 @@ if st.session_state["messages"]:
     for i, msg in enumerate(st.session_state["messages"]):
         st.markdown(f"**{i+1}.** {msg}")
 
-# 🎤 Generate voice notes + upload to GitHub
+# 🎤 Generate voice notes + GitHub upload
 if st.button("🎤 Generate Voice Notes"):
     if not st.session_state["messages"]:
         st.warning("⚠️ Generate messages first.")
@@ -212,30 +205,21 @@ if st.button("🎤 Generate Voice Notes"):
         )
 
         if res.status_code == 200 and res.content:
-    file_id = f"{vars['first_name']}_{idx}"
-    filename = f"voice_notes/{file_id}.mp3"
+            file_id = f"{vars['first_name']}_{idx}"
+            filename = f"voice_notes/{file_id}.mp3"
 
-    # ✅ Only proceed if voice note is valid
-    if len(res.content) > 5000:
-        with open(filename, "wb") as f:
-            f.write(res.content)
+            if len(res.content) > 5000:
+                with open(filename, "wb") as f:
+                    f.write(res.content)
 
-        github_path = f"public/voices/{file_id}.mp3"
-        upload_to_github(filename, github_path)
-        mp3_files.append(filename)
-        hosted_links.append(f"https://voiceoutreach.ai/voice/{file_id}")
-    else:
-        st.warning(f"⚠️ Voice content too short for {file_id}, skipping.")
-else:
-    st.warning(f"❌ ElevenLabs error on row {idx}: {res.text}")
-
-        # ✅ Use the correct clean voice link
-        hosted_links.append(f"https://voiceoutreach.ai/voice/{file_id}")
-    else:
-        st.warning(f"Voice content too short for {file_id}, skipping.")
-
+                github_path = f"public/voices/{file_id}.mp3"
+                upload_to_github(filename, github_path)
+                mp3_files.append(filename)
+                hosted_links.append(f"https://voiceoutreach.ai/voice/{file_id}")
+            else:
+                st.warning(f"⚠️ Voice content too short for {file_id}, skipping.")
         else:
-            st.warning(f"ElevenLabs error on row {idx}: {res.text}")
+            st.warning(f"❌ ElevenLabs error on row {idx}: {res.text}")
 
     st.markdown("### 🔊 Voice Note Previews")
     for i, mp3 in enumerate(mp3_files):
