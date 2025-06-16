@@ -38,7 +38,9 @@ def upload_to_github(filename, repo_path):
 
     put_res = requests.put(api_url, headers=headers, json=data)
     if put_res.status_code not in (200, 201):
-        st.warning(f"❌ GitHub upload failed: {put_res.status_code}")
+    st.error(f"❌ GitHub upload failed: {put_res.status_code}")
+    st.code(put_res.text, language='json')
+
 
 # 🧠 Voice pacing helpers
 def enhance_pacing(text):
