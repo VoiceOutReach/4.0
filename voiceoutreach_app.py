@@ -24,9 +24,9 @@ def upload_to_github(filename, repo_path):
         f"{st.secrets['GITHUB_USERNAME']}/"
         f"{st.secrets['GITHUB_REPO']}/contents/{repo_path}"
     )
-    
-    # 👇 Add debug print
-    print("📦 Uploading to:", api_url)
+
+    # ✅ DEBUG START
+    st.write("📦 Uploading to:", api_url)
 
     headers = {
         "Authorization": f"Bearer {st.secrets['GITHUB_TOKEN']}",
@@ -34,8 +34,11 @@ def upload_to_github(filename, repo_path):
     }
 
     get_res = requests.get(api_url, headers=headers)
-    print("🔍 GET status code:", get_res.status_code)
-    print("🔍 GET response:", get_res.json())
+    st.write("🔍 GET Status:", get_res.status_code)
+    try:
+        st.write("🔍 GET Body:", get_res.json())
+    except:
+        st.write("🔍 GET Error (no JSON)")
 
     sha = get_res.json().get("sha") if get_res.status_code == 200 else None
 
@@ -48,12 +51,15 @@ def upload_to_github(filename, repo_path):
         data["sha"] = sha
 
     put_res = requests.put(api_url, headers=headers, json=data)
-
-    print("🚀 PUT status:", put_res.status_code)
-    print("🚀 PUT response:", put_res.json())
+    st.write("🚀 PUT Status:", put_res.status_code)
+    try:
+        st.write("🚀 PUT Body:", put_res.json())
+    except:
+        st.write("🚀 PUT Error (no JSON)")
+    # ✅ DEBUG END
 
     if put_res.status_code not in (200, 201):
-        st.warning(f"GitHub upload failed: {put_res.status_code}")
+        st.warning(f"❌ GitHub upload failed: {put_res.status_code}")
 
 # 🧠 Pacing + Sentence helpers
 def enhance_pacing(text):
