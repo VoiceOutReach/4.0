@@ -48,11 +48,9 @@ def upload_to_github(filename, repo_path):
 
 # 🧠 Voice pacing helpers
 def enhance_pacing(text):
-    # Add more pause-friendly punctuation
-    text = text.replace('. ', '. ... ')
-    text = text.replace(', ', ', ... ')
-    for trigger in ["Hey ", "Hi ", "Thanks", "Let me know", "I noticed"]:
-        text = text.replace(trigger, f"{trigger}... ")
+    # Just minor sentence smoothing, no forced drama
+    text = text.replace('. ', '. ')
+    text = text.replace(', ', ', ')
     return text
 
 def split_long_sentences(text, max_words=15):
