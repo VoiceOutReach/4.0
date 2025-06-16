@@ -112,9 +112,10 @@ if "messages" not in st.session_state:
 # 🧠 Prompt UI
 use_gpt = st.checkbox("Use GPT to generate full message")
 
-def_prompt = """Write a casual LinkedIn message to {first_name}, who works as a {position} at {company_name}. I recently connected with them, and I noticed their team is hiring for a {hiring_for_job_title} role.
+def_prompt = """Write a short and friendly LinkedIn message to {first_name}, who is a {position} at {company_name}. I just connected with them and saw their team is hiring for a {hiring_for_job_title} role.
 
-Reference something from the job description: {job_description}, and let them know I might have someone who’s a great fit. Keep it warm, conversational, and under 100 words — like something a recruiter would actually send."""
+Based on this job description: {job_description}, mention a specific responsibility or tool, and casually let them know I might know someone who’s a fit. Keep it under 100 words and sound human — avoid buzzwords like “AI-driven campaigns” or “strong background”
+."""
 
 if use_gpt and not st.session_state.get("default_prompt_loaded", False):
     st.session_state["gpt_prompt"] = def_prompt
