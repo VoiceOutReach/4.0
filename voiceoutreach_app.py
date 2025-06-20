@@ -197,7 +197,7 @@ if st.button("🎤 Generate Voice Notes"):
             "voice_settings": {
                 "stability": 0.45,
                 "similarity_boost": 0.85,
-                "style": 0.5
+                "style": 0.9
             }
         }
 
