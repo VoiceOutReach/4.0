@@ -193,7 +193,7 @@ if st.button("🎤 Generate Voice Notes"):
 
         payload = {
             "text": message,
-            "model_id": "eleven_multilingual_v2",
+            "model_id": "eleven_multilingual_v1",
             "voice_settings": {
                 "stability": 0.55,
                 "similarity_boost": 0.85,
