@@ -223,7 +223,7 @@ if st.button("🎤 Generate Voice Notes"):
                 github_path = f"public/voices/{file_id}.mp3"
                 upload_to_github(filename, github_path)
                 mp3_files.append(filename)
-                hosted_links.append(f"https://voiceoutreach.ai/voicenote/{file_id}")
+                hosted_links.append(f"https://player.voiceoutreach.ai/voicenote/{file_id}")
             else:
                 st.warning(f"⚠️ Voice content too short for {file_id}, skipping.")
         else:
