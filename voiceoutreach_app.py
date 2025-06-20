@@ -195,7 +195,7 @@ if st.button("🎤 Generate Voice Notes"):
             "text": message,
             "model_id": "eleven_multilingual_v1",
             "voice_settings": {
-                "stability": 0.3.5,
+                "stability": 0.4,
                 "similarity_boost": 0.85,
                 "style": 0.45
             }
